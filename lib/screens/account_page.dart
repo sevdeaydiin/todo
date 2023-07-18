@@ -6,6 +6,8 @@ import '../login_controller.dart';
 import '../theme.dart';
 
 class Account extends StatefulWidget {
+  const Account({super.key});
+
   
   @override
   State<Account> createState() => _AccountState();
@@ -31,8 +33,7 @@ final controller = Get.put(LoginController());
               const SizedBox(height: 50),
               textContainer(context, '${controller.googleAccount.value?.displayName}', Get.textTheme.headlineMedium,50),
               const SizedBox(height: 13),
-             textContainer(context, '${controller.googleAccount.value?.email}', Get.textTheme.bodyMedium,30),
-           
+              textContainer(context, '${controller.googleAccount.value?.email}', Get.textTheme.bodyMedium,30),
               const SizedBox(height: 40),
               /* ActionChip(
                 avatar: const Icon(Icons.logout_outlined),
@@ -41,26 +42,24 @@ final controller = Get.put(LoginController());
                   Navigator.pop(context);
                   await controller.logout();
                 },) */
-             ElevatedButton(
+            ElevatedButton(
               onPressed: ()async{
+                await controller.logout();
                   Navigator.pop(context);
-                  await controller.logout();
+                  
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.white,maximumSize: const Size(130,50),elevation: 5),
-            child: Container(
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-                    child: const Icon(Icons.logout_outlined, color: purple),
-                  ),
-                  const Text('Çıkış',style: TextStyle(fontWeight: FontWeight.w500,color: Colors.black),
-                  ),
-                ],
-              ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+                  child: const Icon(Icons.logout_outlined, color: purple),
+                ),
+                const Text('Çıkış',style: TextStyle(fontWeight: FontWeight.w500,color: Colors.black),
+                ),
+              ],
             ),
-            ), 
-              
+            ),
             ],
           ),
         ),
