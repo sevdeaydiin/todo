@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:goole_sign_in/state_controller.dart';
 
 import '../constants.dart';
 import '../model/todo.dart';
@@ -10,7 +12,8 @@ class TodoItem extends StatelessWidget {
   final onToDoChanged;
   final onDeleteItem;
   
-  const TodoItem({super.key,required this.todo,required this.onToDoChanged,required this.onDeleteItem});
+   TodoItem({super.key,required this.todo,required this.onToDoChanged, required this.onDeleteItem});
+  final _category = Get.put(StateController());
 
   @override
   Widget build(BuildContext context) {
@@ -19,17 +22,30 @@ class TodoItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 15),
       child: ListTile(
         onTap: (){
-          onToDoChanged(todo);
+          print('hello');
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 20,vertical: 5),
           tileColor: isDark(context) ? Colors.black : Colors.white,
-          leading: todo.isDone ? const Icon(Icons.check_box,color: purple,) : const Icon(Icons.check_box_outline_blank,color: purple,),
+          leading: PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(value: _category.category[1],child: Text(_category.category[1].toString()),),
+              PopupMenuItem(value: _category.category[2],child: Text(_category.category[2].toString()),),
+              PopupMenuItem(value: _category.category[3],child: Text(_category.category[3].toString()),),
+            ],
+            onSelected: (value){
+              print('selected: $value');
+            },
+            onOpened: (){
+              print('deneme');
+            },
+
+          ),
           title: Text(
-            todo.todoText!,
+            todo.todoText,
             style: TextStyle(fontSize: 16,color:  isDark(context) ? Colors.white : Colors.black,
-            decoration: todo.isDone ? TextDecoration.lineThrough : null),),
+            decoration: todo.isDone() ? TextDecoration.lineThrough : null),),
             trailing: Container(
               padding: const EdgeInsets.all(0),
               height: 35,
@@ -42,7 +58,7 @@ class TodoItem extends StatelessWidget {
               color: purple,
               iconSize: 18,
               onPressed: () {
-               onDeleteItem(todo.id);
+              onDeleteItem(todo.id);
               },
               ),
             ),
@@ -50,3 +66,7 @@ class TodoItem extends StatelessWidget {
     );
   }
 }
+
+
+
+//todo.isDone ? const Icon(Icons.check_box,color: purple,) : const Icon(Icons.check_box_outline_blank,color: purple,),
