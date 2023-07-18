@@ -13,6 +13,8 @@ final controller = Get.put(LoginController());
   final String text='Görevlerinizi organize edin ve zamanınızı verimli kullanın!';
   final String text2='Google ile devam et';
 
+  LoginPage({super.key});
+
   @override
   Widget build(BuildContext context) {
 
@@ -27,8 +29,6 @@ final controller = Get.put(LoginController());
           }
         })
         ),
-
-        
         
     );
   }
@@ -39,7 +39,7 @@ final controller = Get.put(LoginController());
         actions: [
           IconButton(onPressed: (){}, icon: const Icon(Icons.notifications),),
           IconButton(onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> Account()));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> const Account()));
           }, icon: const Icon(Icons.settings),),
         ]),
         body: const SecondPage(),
@@ -56,23 +56,21 @@ final controller = Get.put(LoginController());
             const SizedBox(height: 30),
             Text(text, style: Theme.of(context).textTheme.headlineSmall,textAlign: TextAlign.center,),
             const SizedBox(height: 45),
-           ElevatedButton(
+            ElevatedButton(
               onPressed: () async{
                 controller.login();
-            }, 
+            },
             style: ElevatedButton.styleFrom(backgroundColor: lightBackgroundColor,maximumSize: const Size(230,50),elevation: 5),
-            child: Container(
-              child: Row(
-                children: [
-                  Container(
-                   // margin: EdgeInsets.symmetric(horizontal: 15),
-                    padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-                    child: Image.asset('assets/google.png',height: 20,width: 20,),
-                  ),
-                   Text(text2,style: const TextStyle(fontWeight: FontWeight.w500,color: Colors.black),
-                  ),
-                ],
-              ),
+            child: Row(
+              children: [
+                Container(
+                 // margin: EdgeInsets.symmetric(horizontal: 15),
+                  padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+                  child: Image.asset('assets/google.png',height: 20,width: 20,),
+                ),
+                Text(text2,style: const TextStyle(fontWeight: FontWeight.w500,color: Colors.black),
+                ),
+              ],
             ),
             ),
         ],
