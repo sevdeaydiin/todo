@@ -7,7 +7,8 @@ ThemeData lightThemeData(BuildContext context){
     scaffoldBackgroundColor: lightBackgroundColor,
     iconTheme: const IconThemeData(color: purple),
     primaryIconTheme: const IconThemeData(color: purple),
-    appBarTheme: const AppBarTheme(backgroundColor: lightBackgroundColor,elevation: 0,actionsIconTheme: IconThemeData(color: purple),centerTitle: true),
+    appBarTheme: const AppBarTheme(backgroundColor: lightBackgroundColor,elevation: 0,actionsIconTheme: IconThemeData(color: purple),centerTitle: true, 
+    titleTextStyle: TextStyle(color: purple,fontSize: 25)),
     elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(backgroundColor: purple,)),
   
   );

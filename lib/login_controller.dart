@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+/* import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginController extends GetxController{
@@ -12,4 +12,4 @@ class LoginController extends GetxController{
   logout() async{
     googleAccount.value = await _googleSingin.signOut();
   }
-}
+} */

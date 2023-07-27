@@ -1,40 +1,40 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:goole_sign_in/constants.dart';
+import 'package:goole_sign_in/screens/todo_add.dart';
 import 'package:goole_sign_in/state_controller.dart';
+import 'package:goole_sign_in/storage_service_api.dart';
 
 import '../model/todo.dart';
 import '../theme.dart';
 import '../widgets/todo_item.dart';
+import 'account_page.dart';
 
 
 class SecondPage extends StatefulWidget {
-  const SecondPage({super.key});
+   const SecondPage({super.key});
 
   @override
-  State<SecondPage> createState() => _SecondPageState();
+  State<SecondPage> createState() => SecondPageState();
 }
 
-class _SecondPageState extends State<SecondPage> {
+class SecondPageState extends State<SecondPage> {
   final String hintText = 'Ara';
   final String text='Tümü';
   final String hintText2 = 'Yeni bir yapılacak iş öğesi ekle';
   final String add = '+';
+  final pageController = PageController();
 
-  //final _state = Get.put(StateController());
-
-  //final todoList = ToDo.todoList();
-  final _todoController = TextEditingController();
   List<ToDo> todoList = [];
-  List<ToDo> _foundToDo=[];
+  List<ToDo> _foundToDo = [];
   var todoCollection = FirebaseFirestore.instance.collection('deneme-collection');
   
   @override
   void initState() {
-   // _foundToDo=todoList;
     _fetchToDoList();
+    getCategories();
     super.initState();
   }
 
@@ -52,17 +52,41 @@ class _SecondPageState extends State<SecondPage> {
   }
 
   var selected = 0;
+  final category = Get.put(StateController());
+  List<Widget> categoryWidgets=[];
+  List<ToDo> todos=[];
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                searchContainer(context),
-                Expanded(
+    
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(onPressed: (){}, icon: const Icon(Icons.notifications),),
+          IconButton(onPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> const Account()));
+          }, icon: const Icon(Icons.settings),),
+        ]),
+      body: Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  searchContainer(context),
+                  listView(),
+                ],
+              ),
+            ),
+            addButton(context),
+          ],
+        ),
+    );
+   // );
+  }
+
+  Expanded listView() {
+    return Expanded(
                   child: ListView(
                     children: [
                       TodoCategory(selected, (int index){
@@ -70,78 +94,97 @@ class _SecondPageState extends State<SecondPage> {
                           selected=index;
                         });
                       }),
-                      for(ToDo todo in _foundToDo)
+                       for(ToDo todo in _foundToDo)
                           TodoItem(
                           todo: todo,
-                          onToDoChanged: _handleToDoChange,
-                          onDeleteItem: _deleteToDoItem,
-                          ),
+                          onToDoChanged: handleToDoChange,
+                          onDeleteItem: deleteToDoItem,
+                          uploadStorage: uploadStorage,
+                          ), 
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          Align(alignment: Alignment.bottomCenter,
-            child: Row(
-              children: [
-                Expanded(child: Container(
-                  margin: const EdgeInsets.only(
-                    bottom: 20,
-                    right: 20,
-                    left: 20,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 5),
-                  decoration:  BoxDecoration(
-                    color: isDark(context) ? Colors.black : Colors.white,
-                  boxShadow: const [ BoxShadow(
-                    color: Colors.grey,
-                    offset: Offset(0.0,0.0),
-                    blurRadius: 5.0,
-                    spreadRadius: 0.0,
-                  ),],
-                  borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: TextField(
-                    controller: _todoController,
-                    decoration: InputDecoration(
-                        hintText: hintText2,
-                        border: InputBorder.none,
-                    ),
-                  ),
-                ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 20,right: 20),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _addToDoItem(_todoController.text);
-                      //addUser(_todoController.text);
-                    },
-                    style: ElevatedButton.styleFrom(elevation: 10,minimumSize: const Size(60,50)),
-                    child: Text(add, style: const TextStyle(fontSize: 30),)
-                    ),
-                )
-              ],
-            ),
-            ),
-        ],
-      );
-   // );
+                );
   }
 
-  void _handleToDoChange(ToDo todo, String id)async{
+  Padding addButton(BuildContext context) {
+    return Padding(
+            padding: const EdgeInsets.only(right: 30,bottom: 30),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: FloatingActionButton(
+                backgroundColor: purple,
+                child: const Icon(Icons.add),
+                onPressed: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>TodoAdd()));
+                },
+              )
+              ),
+          );
+  }
 
-  setState((){
-   
-  });
-  QuerySnapshot querySnapshot = await todoCollection.where('id' , isEqualTo: id).get();
-  // for(QueryDocumentSnapshot documentSnapshot in querySnapshot.docs){
-  //   todoCollection.doc(documentSnapshot.id).update({'isDone':todo.isDone});
-  // }
+  void getCategories(){
+    getCategoryWidgets();
+  }
+
+List<Widget> getCategoryWidgets(){
+  for(int i=0;i<category.category.length;i++){
+    categoryWidgets.add(getCategoryWidget(category.category[i]));
+  }
+  return categoryWidgets;
 }
 
-void _deleteToDoItem(String id)async{
+  Widget getCategoryWidget(String category) {
+    return TextButton(
+      child: Text(category),
+      onPressed: (){
+        setState(() {
+          
+        });
+      },
+      
+    );
+  }
+
+  void uploadStorage(BuildContext context)async {
+    final Storage storage = Storage();
+    
+    final results=await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.any,
+    );
+
+    if(results==null){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No file selected'))
+      );
+    }
+
+    final path = results?.files.single.path;
+    final fileName=results?.files.single.name;
+
+    storage.uploadFile(path!, fileName!).then((value) => print('done'));
+
+  }
+
+
+void handleToDoChange(String state, String id)async{
+  
+  QuerySnapshot querySnapshot = await todoCollection.where('id' , isEqualTo: id).get();
+
+  try {
+    setState(() {
+      for(QueryDocumentSnapshot documentSnapshot in querySnapshot.docs){
+      todoCollection.doc(documentSnapshot.id).update({'todoState':state});
+    }
+    });
+  } catch (e) {
+    print("Error updating todoState in Firestore: $e");
+    
+  }
+}
+
+void deleteToDoItem(String id)async{
+  
   setState(() {
     todoList.removeWhere((item) => item.id==id);
   });
@@ -151,31 +194,20 @@ void _deleteToDoItem(String id)async{
   }
 }
 
-void _addToDoItem(String toDo){
+void addToDoItem(String todoText, String person, String dueDate){
   final newToDo = ToDo(
     id: DateTime.now().microsecondsSinceEpoch.toString(),
-    todoText: toDo,
+    todoText: todoText,
     todoState: 'Başlandı',
+    person: person,
+    dueDate: dueDate,
     );
   setState(() {
       todoList.add(newToDo);
   });
   todoCollection.add(newToDo.toMap());
-  _todoController.clear();
+  //_todoController.clear();
 }
-
-    // Future<void> addUser(String todo) {
-    //  // CollectionReference todoCollection2 = FirebaseFirestore.instance.collection('deneme-collection');
-    //   // Call the user's CollectionReference to add a new user
-    //   return todoCollection
-    //       .add({
-    //         'id': 'todo',
-    //         'todoText': todo,
-    //         'isDone': false,
-    //       })
-    //       .then((value) => print("User Added"))
-    //       .catchError((error) => print("Failed to add user: $error"));
-    // }
 
 void _runFilter(String enteredKeyword){
 List<ToDo> result = [];
@@ -193,7 +225,7 @@ setState(() {
 });
 }
 
-  Widget searchContainer(BuildContext context){
+Widget searchContainer(BuildContext context){
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
@@ -212,10 +244,41 @@ setState(() {
         ),),
     );
   }
-
   
 }
 
+/* class ToDoListView extends StatelessWidget{
+  final int selected;
+  final Function callback;
+  final PageController pageController;
+  final ToDo todo;
+  SecondPageState secondPageState = SecondPageState();
+   ToDoListView(this.selected,this.callback,this.pageController,this.todo);
+  
+  @override
+  Widget build(BuildContext context) {
+    final category = todo.todoState;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 25),
+      child: PageView(
+        controller: pageController,
+        onPageChanged: (index)=> callback(index),
+        children: [
+          ListView.separated(
+            itemBuilder: (context,index){
+              TodoItem(
+                todo: todo, 
+                onToDoChanged: secondPageState.handleToDoChange, 
+                onDeleteItem: secondPageState.deleteToDoItem);
+            }, 
+            separatorBuilder: (_,index) => const SizedBox(height: 15), 
+            itemCount: 4)
+        ],
+      ),
+    );
+  }
+
+} */
 
 class TodoCategory extends StatelessWidget{
 

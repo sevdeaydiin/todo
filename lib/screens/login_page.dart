@@ -1,12 +1,105 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:goole_sign_in/screens/account_page.dart';
 import 'package:goole_sign_in/screens/second_page.dart';
 
-import '../constants.dart';
-import '../login_controller.dart';
+import '../theme.dart';
 
-class LoginPage extends StatelessWidget {
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+
+  final String text='Görevlerinizi organize edin ve zamanınızı verimli kullanın!';
+  TextEditingController userNameController= TextEditingController();
+  TextEditingController passwordController= TextEditingController();
+  String hintPassword='Parola:';
+  String hintUserName='Kullanıcı Adı:';
+  String loginText='Giriş Yap';
+
+  @override
+  Widget build(BuildContext context) {
+
+
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(image: AssetImage('assets/purple.png'),
+          fit: BoxFit.cover)
+        ),
+        child: Center(
+          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 60,vertical: 100),
+          child: Column(
+            children: [
+              Image.asset('assets/pngwing.com.png',height: 250,width: 250,),
+              Text(text,style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),textAlign: TextAlign.center, ),
+              const SizedBox(height: 50),
+              loginTextField(userNameController,hintUserName),
+              const SizedBox(height: 15),
+              loginTextField(passwordController, hintPassword),
+              const SizedBox(height: 30),
+              loginButton(),
+          ]),),
+        ),
+      ),
+    );
+  }
+  
+  loginTextField(TextEditingController controller,String hintText) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 2),
+      width: MediaQuery.of(context).size.width/1.5,
+            decoration: BoxDecoration(
+            color: isDark(context) ? Colors.black : Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                offset: Offset(0.0, 0.0),
+                blurRadius: 5.0,
+                spreadRadius: 0.0,
+              )
+           ],
+      borderRadius: BorderRadius.circular(10),),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: hintText,
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+  
+  loginButton() {
+    return Container(
+      width: MediaQuery.of(context).size.width/1.5,
+      //color: isDark(context) ? Colors.black : Colors.white,
+      decoration: BoxDecoration(
+        //color: isDark(context) ? Colors.black : Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                offset: Offset(0.0, 0.0),
+                blurRadius: 5.0,
+                spreadRadius: 0.0,
+              )
+           ],
+      borderRadius: BorderRadius.circular(10),
+      ),
+      child: ElevatedButton(
+        onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>const SecondPage()));
+        },
+        child: Text(loginText),
+      ),
+    );
+  }
+}
+
+/* class LoginPage extends StatelessWidget {
 
 final controller = Get.put(LoginController());
 
@@ -77,38 +170,4 @@ final controller = Get.put(LoginController());
       ),
     );
   }
-
-  // FloatingActionButton buildLoginButton() {
-  //   return FloatingActionButton.extended(onPressed: (){
-  //     controller.login();
-  //       //GoogleSignIn().signIn();
-  //     }, label: Text('Sign in with Google'));
-  // }
-
-/*   Column buildProfileView() {
-    return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            backgroundImage: Image.network(controller.googleAccount.value?.photoUrl ?? '').image,
-            radius: 100,
-          ),
-          Text(
-            controller.googleAccount.value?.displayName ?? '',
-            style: Get.textTheme.headline3,
-          ),
-          Text(controller.googleAccount.value?.email ?? '',
-            style: Get.textTheme.bodyText1,
-          ),
-          ActionChip(
-            avatar: const Icon(Icons.logout_outlined),
-            label: Text('Logout'),
-            onPressed: (){
-              controller.logout();
-
-            },)
-          
-        ],
-      );
-  } */
-}
+} */
