@@ -22,28 +22,29 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(image: AssetImage('assets/purple.png'),
-          fit: BoxFit.cover)
-        ),
-        child: Center(
-          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 60,vertical: 100),
-          child: Column(
-            children: [
-              Image.asset('assets/pngwing.com.png',height: 250,width: 250,),
-              Text(text,style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),textAlign: TextAlign.center, ),
-              const SizedBox(height: 50),
-              loginTextField(userNameController,hintUserName),
-              const SizedBox(height: 15),
-              loginTextField(passwordController, hintPassword),
-              const SizedBox(height: 30),
-              loginButton(),
-          ]),),
-        ),
+      appBar: AppBar(backgroundColor: Colors.transparent),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(image: AssetImage('assets/purple.png'),
+              fit: BoxFit.cover)
+            ),
+            child: Padding(padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 80),
+             child: Column(
+               children: [
+                 Image.asset('assets/pngwing.com.png',height: 250,width: 250,),
+                 Text(text,style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),textAlign: TextAlign.center, ),
+                 const SizedBox(height: 50),
+                 loginTextField(userNameController,hintUserName),
+                 const SizedBox(height: 15),
+                 loginTextField(passwordController, hintPassword),
+                 const SizedBox(height: 30),
+                 loginButton(),
+             ]),),
+          ),
+        ],
       ),
     );
   }

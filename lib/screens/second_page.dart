@@ -26,16 +26,16 @@ class SecondPageState extends State<SecondPage> {
   final String hintText2 = 'Yeni bir yapılacak iş öğesi ekle';
   final String add = '+';
   final pageController = PageController();
+    AppLifecycleState? appLifecycleState;
 
   List<ToDo> todoList = [];
   List<ToDo> _foundToDo = [];
   var todoCollection = FirebaseFirestore.instance.collection('deneme-collection');
-  
+
   @override
   void initState() {
-    _fetchToDoList();
-    getCategories();
     super.initState();
+    _fetchToDoList();
   }
 
   Future<void> _fetchToDoList() async {
@@ -56,9 +56,11 @@ class SecondPageState extends State<SecondPage> {
   List<Widget> categoryWidgets=[];
   List<ToDo> todos=[];
 
+ 
+
   @override
   Widget build(BuildContext context) {
-    
+    _fetchToDoList();
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -145,7 +147,7 @@ List<Widget> getCategoryWidgets(){
     );
   }
 
-  void uploadStorage(BuildContext context)async {
+  void uploadStorage()async {
     final Storage storage = Storage();
     
     final results=await FilePicker.platform.pickFiles(
@@ -192,21 +194,6 @@ void deleteToDoItem(String id)async{
   for(QueryDocumentSnapshot documentSnapshot in querySnapshot.docs){
     todoCollection.doc(documentSnapshot.id).delete();
   }
-}
-
-void addToDoItem(String todoText, String person, String dueDate){
-  final newToDo = ToDo(
-    id: DateTime.now().microsecondsSinceEpoch.toString(),
-    todoText: todoText,
-    todoState: 'Başlandı',
-    person: person,
-    dueDate: dueDate,
-    );
-  setState(() {
-      todoList.add(newToDo);
-  });
-  todoCollection.add(newToDo.toMap());
-  //_todoController.clear();
 }
 
 void _runFilter(String enteredKeyword){
@@ -301,8 +288,8 @@ class TodoCategory extends StatelessWidget{
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 14),
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), 
-              color: selected == index ? purple : Colors.white),
-              child: Text(_category.category[index],style: const TextStyle(fontWeight: FontWeight.bold),),
+              color: selected == index ? purple : (isDark(context) ? Colors.black : Colors.white)),
+              child: Text(_category.category[index],style: const TextStyle(fontWeight: FontWeight.bold,),),
             ),
           ), 
           separatorBuilder: (_,index) => const SizedBox(width: 20), 

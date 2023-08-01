@@ -9,6 +9,7 @@ import '../constants.dart';
 import '../model/todo.dart';
 import '../theme.dart';
 
+// ignore: must_be_immutable
 class TodoItem extends StatefulWidget {
   ToDo todo;
   final onToDoChanged;
@@ -48,7 +49,23 @@ class _TodoItemState extends State<TodoItem> {
                   backgroundColor: Colors.red,
                   icon: Icons.delete,
                   label: 'Sil',
-                  onPressed: (context)=>widget.onDeleteItem(widget.todo.id)),
+                  onPressed: (context){
+                    showDialog(context: context, builder: (BuildContext context){
+                        return AlertDialog(
+                          title: Text('Silmek istediğinize emin misiniz?'),
+                          actions: [
+                            TextButton(onPressed: (){
+                              widget.onDeleteItem(widget.todo.id);
+                              Navigator.pop(context);
+                            }, child: Text('Evet',style: TextStyle(color: isDark(context) ? Colors.white : Colors.black))),
+                            TextButton(onPressed: (){
+                              Navigator.pop(context);
+                            }, child: Text('Hayır',style: TextStyle(color: isDark(context) ? Colors.white : Colors.black))),
+                          ],
+                        );
+                    });
+                  }
+                  ),
               ],
             ),
             child: ListTile(
@@ -66,11 +83,11 @@ class _TodoItemState extends State<TodoItem> {
                       decoration: widget.todo.isDone() ? TextDecoration.lineThrough : null),),
                       Text(
                       "Kişi: ${widget.todo.person}",
-                      style: TextStyle(fontSize: 15,color:  isDark(context) ? Colors.white : Colors.grey,
+                      style: const TextStyle(fontSize: 15,color: Colors.grey,
                       ),),
                       Text(
                       "Teslim Tarihi: ${widget.todo.dueDate}",
-                      style: TextStyle(fontSize: 15,color:  isDark(context) ? Colors.white : Colors.grey,
+                      style: const TextStyle(fontSize: 15,color: Colors.grey,
                       ),
                       ),
                   ],
@@ -85,14 +102,14 @@ class _TodoItemState extends State<TodoItem> {
 
   Container uploadButton(BuildContext context) {
     return Container(
-                  padding: const EdgeInsets.all(0),
                   height: 45,
                   width: 40,
                   decoration: BoxDecoration(
                     color: isDark(context) ? darkBackgroundColor : lightBackgroundColor,
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child: IconButton(icon: const Icon(Icons.document_scanner),
+                  child: IconButton(
+                  icon: const Icon(Icons.document_scanner),
                   color: purple,
                   iconSize: 18,
                   onPressed: () {
@@ -116,7 +133,7 @@ class _TodoItemState extends State<TodoItem> {
                   if(widget.todo.todoState=='Bitti'){
                     String date=widget.todo.dueDate;
                     //String tm = '${date.substring(0,2)}T${date.substring(3,4)}T${date.substring(5,9)}';
-                    var dt1=DateFormat('dd-MM-yyyy').parse(date);
+                    var dt1=DateFormat('dd/MM/yyyy').parse(date);
                     int result = time.compareTo(dt1); 
                     if(result>0){
                       showModalBottomSheet(
@@ -146,7 +163,6 @@ class _TodoItemState extends State<TodoItem> {
                   }
                   }
                 }
-                
               );
   }
   

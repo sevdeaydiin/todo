@@ -19,10 +19,11 @@ class _TodoAddState extends State<TodoAdd> {
   final String _selectedDateTime = 'Tarih ve saat seçiniz';
   String time="";
   TextEditingController todoText = TextEditingController();
-  TextEditingController person = TextEditingController();
   SecondPageState secondPageState = SecondPageState();
-  List<String> missionPerson = ['Kullanıcı1','Kullanıcı2', 'Kullanıcı3','Kullanıcı4'];
-  late String selectedValue=missionPerson[0];
+  List<String> assignedPerson = ['Kullanıcı1','Kullanıcı2', 'Kullanıcı3','Kullanıcı4'];
+  late String selectedValue=assignedPerson[0];
+  bool _isLoading=false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -60,31 +61,59 @@ class _TodoAddState extends State<TodoAdd> {
            ],
       borderRadius: BorderRadius.circular(10),),
             child: ElevatedButton(
-              onPressed: (){
-                setState(() {
-                    final newToDo = ToDo(
-                      id: DateTime.now().microsecondsSinceEpoch.toString(),
-                      todoText: todoText.text,
-                      todoState: 'Başlandı',
-                      person: selectedValue.toString(),
-                      dueDate: time,
-                      );
-                    setState(() {
-                        secondPageState.todoList.add(newToDo);
-                    });
-                    secondPageState.todoCollection.add(newToDo.toMap());
-                });
-                 todoText.clear();
-                 person.clear();
-                 Navigator.pop(context);
-            }, child: Text(add,style: const TextStyle(fontWeight: FontWeight.w700),)),
+              onPressed: 
+                 _isLoading ? null : _addToFirestore, 
+
+            child: 
+            _isLoading ? const CircularProgressIndicator()
+            : Text(add,style: const TextStyle(fontWeight: FontWeight.w700),)),
           );
+  }
+
+  void _addToFirestore(){
+       String data=todoText.text;
+      
+                        if(data.trim().isNotEmpty){
+                          final newToDo = ToDo(
+                          id: DateTime.now().microsecondsSinceEpoch.toString(),
+                          todoText: todoText.text,
+                          todoState: 'Başlandı',
+                          person: selectedValue.toString(),
+                          dueDate: time,
+                          );
+                        setState(() {
+                            secondPageState.todoList.add(newToDo);
+                        });
+                          setState(() {
+                            _isLoading=true;
+                          });
+                          secondPageState.todoCollection.add(newToDo.toMap()).then((_){
+                          //ekleme başarılı
+                          setState(() {
+                            _isLoading=false;
+                            todoText.clear();
+                            Navigator.pop(context);
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ekleme işlemi başarılı')),
+                          );
+                        } ).catchError((error){
+                          //ekleme hatalı
+                          setState(() {
+                            _isLoading=false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Veri eklenirken bir hata oluştu')));
+                        });
+                        } else{
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Metin alanı boş olamaz')));
+                        }
+                        
+
   }
 
   Future<DateTime?> myShowDatePicker(BuildContext context, DateTime tarih) {
     return showDatePicker(context: context,
               initialDate: tarih,
-              firstDate: DateTime(2022),
+              firstDate: DateTime(2023),
               lastDate: DateTime(2050),
               //locale: const Locale('tr', 'TR'),
               );
@@ -110,7 +139,7 @@ class _TodoAddState extends State<TodoAdd> {
       
       child: DropdownButton<String>(
           value: selectedValue,
-          items: missionPerson.map((String value){
+          items: assignedPerson.map((String value){
             return DropdownMenuItem(
               value: value,
               child: Text(value));
@@ -144,8 +173,7 @@ class _TodoAddState extends State<TodoAdd> {
         onTap: (){
                 DateTime tarih=DateTime.now();
                 myShowDatePicker(context, tarih).then((value) {
-                time="${value!.day}-${value.month}-${value.year}";
-                print('zaman: $time');
+                time="${value!.day}/${value.month}/${value.year}";
                 });
               },
         controller: TextEditingController(text: time),
